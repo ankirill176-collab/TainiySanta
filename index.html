@@ -4,65 +4,117 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Тайный Санта — вишлисты</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎄%3C/text%3E%3C/svg%3E">
 <style>
 :root{
-  --bg:#eef3f4; --card:#ffffff; --text:#1d2a2a; --muted:#64767a;
-  --line:#d6e0e2; --pine:#1f5a45; --berry:#b3262f; --ok:#1f7a55;
-  color-scheme:light;
-}
-@media (prefers-color-scheme:dark){
-  :root{--bg:#121a1b;--card:#1b2526;--text:#e8f0f0;--muted:#8fa3a6;--line:#2c3b3d;--pine:#5fc79c;--berry:#ff8a8f;--ok:#5fc79c;color-scheme:dark}
+  --bg1:#0a1a2a; --bg2:#10304a; --card:rgba(255,255,255,.07); --line:rgba(255,255,255,.16);
+  --text:#f6f2ea; --muted:#a9bccb; --gold:#f2c45a; --red:#ff6b73; --green:#4fc08d;
+  color-scheme:dark;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 Georgia,"Times New Roman",serif}
-main{max-width:640px;margin:0 auto;padding:28px 16px 56px}
-h1{font-size:2rem;margin:0 0 6px;letter-spacing:-.01em}
-.sub{margin:0 0 22px;color:var(--muted)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+html{background:var(--bg1)}
+body{
+  margin:0;color:var(--text);min-height:100vh;
+  font:16px/1.5 Georgia,"Times New Roman",serif;
+  background:
+    radial-gradient(ellipse at 50% -10%,rgba(242,196,90,.14),transparent 55%),
+    linear-gradient(180deg,var(--bg1),var(--bg2) 55%,#0b2132);
+  background-attachment:fixed;
+}
+#snow{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.lights{position:fixed;top:0;left:0;right:0;height:40px;display:flex;justify-content:space-around;pointer-events:none;z-index:3}
+.lights::before{content:"";position:absolute;left:0;right:0;top:6px;height:2px;background:rgba(255,255,255,.22)}
+.lights i{position:relative;top:7px;width:10px;height:16px;border-radius:50% 50% 50% 50%/55% 55% 45% 45%;background:var(--c);box-shadow:0 0 12px var(--c);animation:tw 2.4s ease-in-out infinite;animation-delay:var(--d)}
+@keyframes tw{0%,100%{opacity:1}50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.lights i{animation:none}}
+main{position:relative;z-index:2;max-width:660px;margin:0 auto;padding:58px 16px 56px}
+header{display:flex;gap:14px;align-items:center;margin-bottom:6px}
+h1{font-size:2rem;line-height:1.15;margin:0;letter-spacing:-.01em}
+.sub{margin:6px 0 16px;color:var(--muted)}
+.count-box{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 14px;margin-bottom:16px;color:var(--gold)}
+.note{background:rgba(242,196,90,.1);border:1px solid rgba(242,196,90,.35);border-radius:12px;padding:10px 14px;margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px;backdrop-filter:blur(4px)}
 h2{font-size:1.2rem;margin:0}
 .ask{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-input[type=text]{flex:1;min-width:160px;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--text)}
-button{font:inherit;padding:10px 16px;border-radius:10px;border:1px solid var(--pine);background:var(--pine);color:#fff;cursor:pointer}
-@media (prefers-color-scheme:dark){button{color:#0d1a15}}
-button.plain{background:transparent;color:var(--text);border-color:var(--line)}
-:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
+input[type=text]{flex:1;min-width:160px;font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:rgba(0,0,0,.28);color:var(--text)}
+input[type=text]::placeholder{color:#8aa0b0}
+button{font:inherit;padding:10px 16px;border-radius:10px;border:1px solid var(--gold);background:var(--gold);color:#2a1d00;cursor:pointer;font-weight:600}
+button.plain{background:transparent;color:var(--text);border-color:var(--line);font-weight:400;padding:8px 12px;font-size:.92rem}
+button.plain:hover{border-color:var(--gold)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.chip{background:transparent;color:var(--text);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-weight:400}
+.chip.on{background:var(--green);border-color:var(--green);color:#06241a;font-weight:600}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
-.count{color:var(--muted);font-size:.9rem}
-.bar{height:6px;border-radius:3px;background:var(--line);margin:8px 0 6px;overflow:hidden}
-.bar i{display:block;height:100%;background:var(--ok);transition:width .2s}
+.cnt{color:var(--muted);font-size:.9rem}
+.bar{height:7px;border-radius:4px;background:rgba(255,255,255,.14);margin:10px 0 12px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--gold));transition:width .25s}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 ul{list-style:none;margin:0;padding:0}
 li{border-top:1px solid var(--line)}
 li:first-child{border-top:0}
-li label{display:flex;gap:12px;align-items:flex-start;padding:11px 0;cursor:pointer}
-li input{width:22px;height:22px;margin:2px 0 0;accent-color:var(--ok);flex:none}
+li label{display:flex;gap:12px;align-items:flex-start;padding:12px 0;cursor:pointer}
+li input{width:24px;height:24px;margin:1px 0 0;accent-color:var(--green);flex:none}
 .t{overflow-wrap:anywhere}
 li.done .t{text-decoration:line-through;color:var(--muted)}
-a{color:var(--berry)}
+a{color:var(--gold)}
 .msg{color:var(--muted);padding:6px 0 0}
-.tools{margin:0 0 12px}
+.win{color:var(--green);padding:8px 0 2px}
+.snowbtn{position:fixed;right:12px;bottom:12px;z-index:4;background:rgba(10,26,42,.85);color:var(--text);border:1px solid var(--line);font-weight:400;padding:8px 12px;border-radius:999px}
+footer{text-align:center;color:var(--muted);margin-top:26px;font-size:.95rem}
 </style>
 </head>
 <body>
+<canvas id="snow" aria-hidden="true"></canvas>
+<div class="lights" id="lights" aria-hidden="true"></div>
+<button class="snowbtn" id="snowbtn" type="button">❄ Снег: вкл</button>
+
 <main>
-  <h1>Тайный Санта</h1>
+  <header>
+    <svg viewBox="0 0 64 74" width="52" height="60" aria-hidden="true">
+      <polygon points="32,6 50,30 14,30" fill="#35a273"/>
+      <polygon points="32,20 56,48 8,48" fill="#2b8c60"/>
+      <polygon points="32,34 60,66 4,66" fill="#237a52"/>
+      <rect x="28" y="66" width="8" height="8" fill="#7a4b2a"/>
+      <polygon points="32,0 34,5 40,5 35,8 37,14 32,10 27,14 29,8 24,5 30,5" fill="#f2c45a"/>
+      <circle cx="27" cy="44" r="3" fill="#ff6b73"/><circle cx="38" cy="55" r="3" fill="#f2c45a"/><circle cx="22" cy="60" r="3" fill="#ff6b73"/><circle cx="34" cy="26" r="2.5" fill="#f2c45a"/>
+    </svg>
+    <h1 id="title">Тайный Санта</h1>
+  </header>
   <p class="sub">Введи имя того, кому даришь подарок, и отмечай галочкой то, что уже выбрал. Отметки сохраняются на этом устройстве.</p>
+  <div class="count-box" id="countdown"></div>
+  <div class="note" id="note" hidden></div>
 
   <div class="card">
     <h2>Кому ты даришь подарок?</h2>
     <div class="ask">
       <input type="text" id="name" placeholder="Имя" autocomplete="off" aria-label="Имя того, кому даришь подарок">
-      <button id="go">Показать вишлист</button>
+      <button id="go" type="button">Показать вишлист</button>
     </div>
+    <div class="chips" id="chips"></div>
   </div>
 
   <div id="out"></div>
+  <footer>С наступающим Новым годом! 🎄</footer>
 </main>
 
 <script>
-/* ===== ЗДЕСЬ ТЫ ВПИСЫВАЕШЬ ВИШЛИСТЫ =====
-   Для каждого человека: name — имя, items — список подарков.
-   У подарка: text — название, link — ссылка (необязательно).
-   Не забывай запятые между пунктами. */
+/* ===== НАСТРОЙКИ И ВИШЛИСТЫ: ПРАВЬ ТОЛЬКО ЭТОТ БЛОК ===== */
+
+// Заголовок страницы
+const SITE_TITLE = "Тайный Санта";
+
+// Сообщение для всех над списком (бюджет, дата вручения и т.п.). Пусто — не показывать.
+// Пример: "Бюджет подарка: до 10 000 ₸. Вручаем 31 декабря 🎁"
+const NOTE = "";
+
+// true — под полем имени показываются кнопки с именами (удобно с телефона).
+// false — участникам нужно вводить имя вручную.
+const SHOW_NAME_BUTTONS = true;
+
+// Вишлисты. name — имя, items — подарки.
+// У подарка: text — название, link — ссылка (необязательно).
+// Между пунктами нужны запятые.
 const WISHLISTS = [
   {
     name: "Соня",
@@ -93,14 +145,21 @@ const WISHLISTS = [
   //   items: [ { text: "Подарок 1" }, { text: "Подарок 2" } ],
   // },
 ];
+
 /* ===== ДАЛЬШЕ ТРОГАТЬ НЕ НУЖНО ===== */
 
 (function () {
   var nameInput = document.getElementById("name");
   var out = document.getElementById("out");
+  var chipsBox = document.getElementById("chips");
   var hideDone = false;
   var mem = {};
 
+  document.getElementById("title").textContent = SITE_TITLE;
+  document.title = SITE_TITLE + " — вишлисты";
+  if (NOTE) { var nb = document.getElementById("note"); nb.textContent = NOTE; nb.hidden = false; }
+
+  /* ---------- хранилище ---------- */
   function key(p, it) { return "santa:" + p.name.toLowerCase() + "|" + it.text.toLowerCase(); }
   function getCheck(k) {
     try { var v = localStorage.getItem(k); if (v !== null) return v === "1"; } catch (e) {}
@@ -110,16 +169,18 @@ const WISHLISTS = [
     mem[k] = on;
     try { if (on) localStorage.setItem(k, "1"); else localStorage.removeItem(k); } catch (e) {}
   }
-  function loadName() { try { return localStorage.getItem("santa-name") || ""; } catch (e) { return ""; } }
-  function saveName(v) { try { localStorage.setItem("santa-name", v); } catch (e) {} }
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
   function okUrl(u) { return /^https?:\/\//i.test(u || ""); }
 
+  /* ---------- поиск человека ---------- */
   function find(q) {
-    q = q.trim().toLowerCase();
+    q = q.trim().toLowerCase().replace(/ё/g, "е");
     if (!q) return [];
-    var exact = WISHLISTS.filter(function (p) { return p.name.trim().toLowerCase() === q; });
+    function n(s) { return s.trim().toLowerCase().replace(/ё/g, "е"); }
+    var exact = WISHLISTS.filter(function (p) { return n(p.name) === q; });
     if (exact.length) return exact;
-    return WISHLISTS.filter(function (p) { return p.name.toLowerCase().indexOf(q) > -1; });
+    return WISHLISTS.filter(function (p) { return n(p.name).indexOf(q) > -1; });
   }
 
   function el(tag, cls, text) {
@@ -129,8 +190,38 @@ const WISHLISTS = [
     return n;
   }
 
+  /* ---------- копирование ---------- */
+  function copyText(text, btn) {
+    function ok() { var old = btn.textContent; btn.textContent = "Скопировано ✓"; setTimeout(function () { btn.textContent = old; }, 1600); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(ok, fallback);
+    } else fallback();
+    function fallback() {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); ok(); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+  }
+
+  /* ---------- кнопки с именами ---------- */
+  function renderChips() {
+    chipsBox.innerHTML = "";
+    if (!SHOW_NAME_BUTTONS) return;
+    var cur = nameInput.value.trim().toLowerCase().replace(/ё/g, "е");
+    WISHLISTS.forEach(function (p) {
+      var b = el("button", "chip" + (p.name.toLowerCase().replace(/ё/g, "е") === cur ? " on" : ""), p.name);
+      b.type = "button";
+      b.addEventListener("click", function () { nameInput.value = p.name; go(); });
+      chipsBox.appendChild(b);
+    });
+  }
+
+  /* ---------- основной вывод ---------- */
   function render() {
     out.innerHTML = "";
+    renderChips();
     var q = nameInput.value;
     if (!q.trim()) return;
     var found = find(q);
@@ -145,7 +236,7 @@ const WISHLISTS = [
 
       var head = el("div", "head");
       head.appendChild(el("h2", "", p.name));
-      head.appendChild(el("span", "count", total ? done + " из " + total : "список пуст"));
+      head.appendChild(el("span", "cnt", total ? "отмечено " + done + " из " + total : "список пуст"));
       card.appendChild(head);
 
       var bar = el("div", "bar");
@@ -155,23 +246,46 @@ const WISHLISTS = [
       card.appendChild(bar);
 
       var tools = el("div", "tools");
-      var toggle = el("button", "plain", hideDone ? "Показать отмеченное" : "Скрыть отмеченное");
-      toggle.addEventListener("click", function () { hideDone = !hideDone; render(); });
-      tools.appendChild(toggle);
+      var tg = el("button", "plain", hideDone ? "Показать отмеченное" : "Скрыть отмеченное");
+      tg.type = "button";
+      tg.addEventListener("click", function () { hideDone = !hideDone; render(); });
+      tools.appendChild(tg);
+
+      var cp = el("button", "plain", "Копировать список");
+      cp.type = "button";
+      cp.addEventListener("click", function () {
+        var lines = p.items.filter(function (it) { return !getCheck(key(p, it)); })
+          .map(function (it, i) { return (i + 1) + ". " + it.text + (okUrl(it.link) ? " " + it.link : ""); });
+        copyText("Вишлист: " + p.name + "\n" + (lines.length ? lines.join("\n") : "(всё отмечено)"), cp);
+      });
+      tools.appendChild(cp);
+
+      var rs = el("button", "plain", "Сбросить отметки");
+      rs.type = "button";
+      rs.addEventListener("click", function () {
+        if (!done) return;
+        if (confirm("Снять все галочки в списке «" + p.name + "»?")) {
+          p.items.forEach(function (it) { setCheck(key(p, it), false); });
+          render();
+        }
+      });
+      tools.appendChild(rs);
       card.appendChild(tools);
+
+      // неотмеченные сверху, отмеченные внизу
+      var order = p.items.map(function (it, i) { return { it: it, i: i, on: getCheck(key(p, it)) }; });
+      order.sort(function (a, b) { return (a.on - b.on) || (a.i - b.i); });
 
       var ul = document.createElement("ul");
       var shown = 0;
-      p.items.forEach(function (it) {
-        var k = key(p, it);
-        var on = getCheck(k);
-        if (hideDone && on) return;
+      order.forEach(function (o) {
+        if (hideDone && o.on) return;
         shown++;
-        var li = el("li", on ? "done" : "");
+        var it = o.it, k = key(p, it);
+        var li = el("li", o.on ? "done" : "");
         var label = document.createElement("label");
         var cb = document.createElement("input");
-        cb.type = "checkbox";
-        cb.checked = on;
+        cb.type = "checkbox"; cb.checked = o.on;
         cb.addEventListener("change", function () { setCheck(k, cb.checked); render(); });
         var t = el("span", "t", it.text);
         if (okUrl(it.link)) {
@@ -186,17 +300,82 @@ const WISHLISTS = [
         ul.appendChild(li);
       });
       if (shown) card.appendChild(ul);
-      else card.appendChild(el("div", "msg", total ? "Всё отмечено." : "Пока ничего не добавлено."));
+      else card.appendChild(el("div", "msg", total ? "" : "Пока ничего не добавлено."));
+      if (total && done === total) card.appendChild(el("div", "win", "Все пункты отмечены 🎄"));
       out.appendChild(card);
     });
   }
 
-  function go() { saveName(nameInput.value.trim()); render(); }
+  function go() { lsSet("santa-name", nameInput.value.trim()); render(); }
   document.getElementById("go").addEventListener("click", go);
   nameInput.addEventListener("keydown", function (e) { if (e.key === "Enter") go(); });
 
-  nameInput.value = loadName();
+  nameInput.value = lsGet("santa-name") || "";
   render();
+
+  /* ---------- обратный отсчёт ---------- */
+  var cd = document.getElementById("countdown");
+  function tick() {
+    var now = new Date();
+    if (now.getMonth() === 0 && now.getDate() === 1) { cd.textContent = "🎉 С Новым годом!"; return; }
+    var target = new Date(now.getFullYear() + 1, 0, 1, 0, 0, 0);
+    var ms = target - now;
+    var d = Math.floor(ms / 86400000);
+    var h = Math.floor(ms % 86400000 / 3600000);
+    var m = Math.floor(ms % 3600000 / 60000);
+    var sec = Math.floor(ms % 60000 / 1000);
+    cd.textContent = "До Нового года: " + d + " дн. " + h + " ч. " + m + " мин. " + sec + " сек.";
+  }
+  tick(); setInterval(tick, 1000);
+
+  /* ---------- гирлянда ---------- */
+  var colors = ["#ff6b73", "#f2c45a", "#4fc08d", "#6bb7ff"];
+  var lights = document.getElementById("lights");
+  var count = Math.max(12, Math.min(32, Math.round(window.innerWidth / 36)));
+  for (var i = 0; i < count; i++) {
+    var b = document.createElement("i");
+    b.style.setProperty("--c", colors[i % colors.length]);
+    b.style.setProperty("--d", (i % 5) * 0.45 + "s");
+    lights.appendChild(b);
+  }
+
+  /* ---------- снег ---------- */
+  var cv = document.getElementById("snow"), cx = cv.getContext("2d");
+  var snowBtn = document.getElementById("snowbtn");
+  var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var saved = lsGet("santa-snow");
+  var snowOn = saved ? saved === "1" : !reduce;
+  var flakes = [], W = 0, H = 0, raf = 0;
+
+  function resize() {
+    var dpr = window.devicePixelRatio || 1;
+    W = window.innerWidth; H = window.innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var n = Math.round(Math.min(110, Math.max(35, W / 12)));
+    flakes = [];
+    for (var i = 0; i < n; i++) flakes.push({ x: Math.random() * W, y: Math.random() * H, r: 1 + Math.random() * 2.6, s: .4 + Math.random() * 1.1, p: Math.random() * 6.28 });
+  }
+  function frame() {
+    cx.clearRect(0, 0, W, H);
+    cx.fillStyle = "rgba(255,255,255,.85)";
+    for (var i = 0; i < flakes.length; i++) {
+      var f = flakes[i];
+      f.y += f.s; f.p += .012; f.x += Math.sin(f.p) * .4;
+      if (f.y > H + 5) { f.y = -5; f.x = Math.random() * W; }
+      cx.beginPath(); cx.arc(f.x, f.y, f.r, 0, 6.283); cx.fill();
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  function applySnow() {
+    cancelAnimationFrame(raf);
+    cx.clearRect(0, 0, W, H);
+    snowBtn.textContent = snowOn ? "❄ Снег: вкл" : "❄ Снег: выкл";
+    if (snowOn) frame();
+  }
+  snowBtn.addEventListener("click", function () { snowOn = !snowOn; lsSet("santa-snow", snowOn ? "1" : "0"); applySnow(); });
+  window.addEventListener("resize", function () { resize(); });
+  resize(); applySnow();
 })();
 </script>
 </body>
