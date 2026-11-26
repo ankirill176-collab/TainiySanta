@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Тайный Санта — вишлисты</title>
+<style>
+:root{
+  --bg:#eef3f4; --card:#ffffff; --text:#1d2a2a; --muted:#64767a;
+  --line:#d6e0e2; --pine:#1f5a45; --berry:#b3262f; --ok:#1f7a55;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#121a1b;--card:#1b2526;--text:#e8f0f0;--muted:#8fa3a6;--line:#2c3b3d;--pine:#5fc79c;--berry:#ff8a8f;--ok:#5fc79c;color-scheme:dark}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 Georgia,"Times New Roman",serif}
+main{max-width:640px;margin:0 auto;padding:28px 16px 56px}
+h1{font-size:2rem;margin:0 0 6px;letter-spacing:-.01em}
+.sub{margin:0 0 22px;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+h2{font-size:1.2rem;margin:0}
+.ask{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+input[type=text]{flex:1;min-width:160px;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--text)}
+button{font:inherit;padding:10px 16px;border-radius:10px;border:1px solid var(--pine);background:var(--pine);color:#fff;cursor:pointer}
+@media (prefers-color-scheme:dark){button{color:#0d1a15}}
+button.plain{background:transparent;color:var(--text);border-color:var(--line)}
+:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
+.head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.count{color:var(--muted);font-size:.9rem}
+.bar{height:6px;border-radius:3px;background:var(--line);margin:8px 0 6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok);transition:width .2s}
+ul{list-style:none;margin:0;padding:0}
+li{border-top:1px solid var(--line)}
+li:first-child{border-top:0}
+li label{display:flex;gap:12px;align-items:flex-start;padding:11px 0;cursor:pointer}
+li input{width:22px;height:22px;margin:2px 0 0;accent-color:var(--ok);flex:none}
+.t{overflow-wrap:anywhere}
+li.done .t{text-decoration:line-through;color:var(--muted)}
+a{color:var(--berry)}
+.msg{color:var(--muted);padding:6px 0 0}
+.tools{margin:0 0 12px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Тайный Санта</h1>
+  <p class="sub">Введи имя того, кому даришь подарок, и отмечай галочкой то, что уже выбрал. Отметки сохраняются на этом устройстве.</p>
+
+  <div class="card">
+    <h2>Кому ты даришь подарок?</h2>
+    <div class="ask">
+      <input type="text" id="name" placeholder="Имя" autocomplete="off" aria-label="Имя того, кому даришь подарок">
+      <button id="go">Показать вишлист</button>
+    </div>
+  </div>
+
+  <div id="out"></div>
+</main>
+
+<script>
+/* ===== ЗДЕСЬ ТЫ ВПИСЫВАЕШЬ ВИШЛИСТЫ =====
+   Для каждого человека: name — имя, items — список подарков.
+   У подарка: text — название, link — ссылка (необязательно).
+   Не забывай запятые между пунктами. */
+const WISHLISTS = [
+  {
+    name: "Соня",
+    items: [
+      { text: "Расческа" },
+      // { text: "Наушники", link: "https://example.com" },
+    ],
+  },
+  {
+    name: "Кирилл",
+    items: [
+      { text: "Porsche 911 на радиоуправлении с Drift — 5 000–8 000 ₸" },
+      { text: "Чёрный коврик для мыши 40×40 см — 2 000–3 000 ₸" },
+      { text: "RGB LED-лента для комнаты — 1 500–2 500 ₸" },
+      { text: "Постер Porsche 911 в чёрной рамке — 1 500–3 000 ₸" },
+      { text: "Подставка для наушников — 1 500–2 500 ₸" },
+      { text: "Органайзер для игрового стола — 1 000–2 000 ₸" },
+      { text: "Мини RGB-лампа — 2 000–3 000 ₸" },
+      { text: "Коллекционная модель Porsche 911 — 2 000–4 000 ₸" },
+      { text: "Держатель провода мыши — 1 000–2 000 ₸" },
+      { text: "Подставка под запястье — 1 000–2 000 ₸" },
+      { text: "Игрушечный револьвер с пульками, автоматический — 7 000 ₸" },
+      { text: "Desert Eagle золотой, Rockkiddo, детский пистолет с пульками — Дигл золотой", link: "https://www.wildberries.kz/catalog/415701859/detail.aspx?size=595481293" },
+    ],
+  },
+  // {
+  //   name: "Имя",
+  //   items: [ { text: "Подарок 1" }, { text: "Подарок 2" } ],
+  // },
+];
+/* ===== ДАЛЬШЕ ТРОГАТЬ НЕ НУЖНО ===== */
+
+(function () {
+  var nameInput = document.getElementById("name");
+  var out = document.getElementById("out");
+  var hideDone = false;
+  var mem = {};
+
+  function key(p, it) { return "santa:" + p.name.toLowerCase() + "|" + it.text.toLowerCase(); }
+  function getCheck(k) {
+    try { var v = localStorage.getItem(k); if (v !== null) return v === "1"; } catch (e) {}
+    return !!mem[k];
+  }
+  function setCheck(k, on) {
+    mem[k] = on;
+    try { if (on) localStorage.setItem(k, "1"); else localStorage.removeItem(k); } catch (e) {}
+  }
+  function loadName() { try { return localStorage.getItem("santa-name") || ""; } catch (e) { return ""; } }
+  function saveName(v) { try { localStorage.setItem("santa-name", v); } catch (e) {} }
+  function okUrl(u) { return /^https?:\/\//i.test(u || ""); }
+
+  function find(q) {
+    q = q.trim().toLowerCase();
+    if (!q) return [];
+    var exact = WISHLISTS.filter(function (p) { return p.name.trim().toLowerCase() === q; });
+    if (exact.length) return exact;
+    return WISHLISTS.filter(function (p) { return p.name.toLowerCase().indexOf(q) > -1; });
+  }
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+
+  function render() {
+    out.innerHTML = "";
+    var q = nameInput.value;
+    if (!q.trim()) return;
+    var found = find(q);
+    if (!found.length) {
+      out.appendChild(el("div", "msg", "Такого имени нет. Проверь написание."));
+      return;
+    }
+    found.forEach(function (p) {
+      var card = el("div", "card");
+      var done = p.items.filter(function (it) { return getCheck(key(p, it)); }).length;
+      var total = p.items.length;
+
+      var head = el("div", "head");
+      head.appendChild(el("h2", "", p.name));
+      head.appendChild(el("span", "count", total ? done + " из " + total : "список пуст"));
+      card.appendChild(head);
+
+      var bar = el("div", "bar");
+      var fill = document.createElement("i");
+      fill.style.width = (total ? Math.round(done / total * 100) : 0) + "%";
+      bar.appendChild(fill);
+      card.appendChild(bar);
+
+      var tools = el("div", "tools");
+      var toggle = el("button", "plain", hideDone ? "Показать отмеченное" : "Скрыть отмеченное");
+      toggle.addEventListener("click", function () { hideDone = !hideDone; render(); });
+      tools.appendChild(toggle);
+      card.appendChild(tools);
+
+      var ul = document.createElement("ul");
+      var shown = 0;
+      p.items.forEach(function (it) {
+        var k = key(p, it);
+        var on = getCheck(k);
+        if (hideDone && on) return;
+        shown++;
+        var li = el("li", on ? "done" : "");
+        var label = document.createElement("label");
+        var cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.checked = on;
+        cb.addEventListener("change", function () { setCheck(k, cb.checked); render(); });
+        var t = el("span", "t", it.text);
+        if (okUrl(it.link)) {
+          t.appendChild(document.createTextNode(" "));
+          var a = el("a", "", "ссылка");
+          a.href = it.link; a.target = "_blank"; a.rel = "noopener noreferrer";
+          a.addEventListener("click", function (e) { e.stopPropagation(); });
+          t.appendChild(a);
+        }
+        label.appendChild(cb); label.appendChild(t);
+        li.appendChild(label);
+        ul.appendChild(li);
+      });
+      if (shown) card.appendChild(ul);
+      else card.appendChild(el("div", "msg", total ? "Всё отмечено." : "Пока ничего не добавлено."));
+      out.appendChild(card);
+    });
+  }
+
+  function go() { saveName(nameInput.value.trim()); render(); }
+  document.getElementById("go").addEventListener("click", go);
+  nameInput.addEventListener("keydown", function (e) { if (e.key === "Enter") go(); });
+
+  nameInput.value = loadName();
+  render();
+})();
+</script>
+</body>
+</html>
